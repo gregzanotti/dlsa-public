@@ -40,3 +40,7 @@ To create residuals, first ensure that input data is present in the `data` direc
 python3 run_factor_model.py -m factor_model_name_here
 ```
 Generated residuals for the factor model will be saved in the `residuals` folder.
+
+## Contributing
+
+Code is released as is, but we welcome pull requests for any issues.
