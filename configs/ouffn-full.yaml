@@ -1,0 +1,44 @@
+# Major parameters
+mode: "test"  # can be 'test' or 'estimate'
+results_tag: ""  # optional; try not to use underscores in this tag, use dashes instead
+debug: False  # set to True to turn on debug logging and file naming
+# Model parameters
+model_name: "OUFFN"  # name of a class defined in models folder and initialized in model folder's __init__.py
+model: {  #  contains parameter settings for __init__() function of class with name `model_name`
+  lookback: 30,  # number of days of preprocessed residual time series to feed into model
+  dropout: 0.25,
+  hidden_units: [4,4,4,4],  # must start with 4, the OU signal length
+}
+# Data parameters
+preprocess_func: "preprocess_ou"  # name of a function defined in preprocess.py
+use_residual_weights: False  # use residual composition matrix to compute turnover, short proportion, etc.
+cap_proportion: 0.01  # defines asset universe: 0.01 corresponds to a residual data set
+factor_models: {  # number of factors per residual time series to test, for each factor model
+    "IPCA": [5],
+    "PCA": [5],
+    "FamaFrench": [5],
+}
+perturbation: {  # perturbation of residual time series by noise is optional, leave empty or comment out entirely to disable
+    # "noise_type" : "gaussian",
+    # "noise_mean" : 0.0,
+    # "noise_std_pct" : 2,
+    # "noise_only" : False,
+    # "per_residual" : True,
+}
+# Training parameters
+num_epochs: 100
+optimizer_name: "Adam"  # see PyTorch docs for potential optimizers
+optimizer_opts: {  # see PyTorch docs for optimizer options
+  lr: 0.001
+}
+batch_size: 125
+retrain_freq: 125  # if mode=='estimate', this is the number of obs used to form a test set (chronologically after the training set)
+rolling_retrain: True  # set to False for no rolling retraining (i.e. train once, test for all data past training set)
+force_retrain: True  # force the model to be trained, even if existing weights for the model are saved on disk
+length_training: 1000  # size of rolling training window in trading days
+early_stopping: False  # employ early stopping or not
+objective: "sharpe"  # objective function: 'sharpe' or 'meanvar' or 'sqrtMeanSharpe'
+# Market frictions parameters
+market_frictions: False  # enable or disable
+trans_cost: 0  # cost in bps per txn side per equity, e.g. 0.0005
+hold_cost: 0  # cost in bps for short positions per equity per day, e.g. 0.0001
