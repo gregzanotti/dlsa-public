@@ -43,4 +43,8 @@ Generated residuals for the factor model will be saved in the `residuals` folder
 
 ## Contributing
 
-Code is released as is, but we welcome pull requests for any issues.
+Code is released as is, but we welcome pull requests for any issues. 
+
+## Notes
+
+Note that `use_residual_weights` must be set to True in configuration files to reproduce results of the paper. Unfortunately, original asset return and characteristic data cannot be released due to our licensing agreements with data providers.
