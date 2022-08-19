@@ -47,4 +47,4 @@ Code is released as is, but we welcome pull requests for any issues.
 
 ## Notes
 
-Note that `use_residual_weights` must be set to True in configuration files to reproduce results of the paper. Unfortunately, original asset return and characteristic data cannot be released due to our licensing agreements with data providers.
+Note that `use_residual_weights` must be set to True in configuration files to reproduce results of the paper. Unfortunately, we can't release original asset return and characteristic data due to licensing agreements with our data providers. The corresponding author for this work is Greg Zanotti.
