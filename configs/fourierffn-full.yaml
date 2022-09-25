@@ -11,7 +11,7 @@ model: {  #  contains parameter settings for __init__() function of class with n
 }
 # Data parameters
 preprocess_func: "preprocess_fourier"  # name of a function defined in preprocess.py
-use_residual_weights: False  # use residual composition matrix to compute turnover, short proportion, etc.
+use_residual_weights: True  # use residual composition matrix to compute turnover, short proportion, etc.
 cap_proportion: 0.01  # defines asset universe: 0.01 corresponds to a residual data set
 factor_models: {  # number of factors per residual time series to test, for each factor model
     "IPCA": [5],
