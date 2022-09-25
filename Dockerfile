@@ -19,6 +19,7 @@ RUN apt-get -qq -y update && \
         make \
         sudo \
         bash-completion \
+        build-essential \
         tree \
         software-properties-common && \
         apt-get update && \
@@ -45,6 +46,9 @@ RUN export SED_RANGE="$(($(sed -n '\|enable bash completion in interactive shell
 # Use C.UTF-8 locale to avoid issues with ASCII encoding
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+
+# install linter Black
+RUN pip install black
 
 # COPY requirements.txt requirements.txt
 # RUN pip install --upgrade pip venv
