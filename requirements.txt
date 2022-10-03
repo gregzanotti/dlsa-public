@@ -8,3 +8,5 @@ matplotlib==3.4.3
 twilio==6.63.1
 PyYAML==5.4.1
 scikit_learn==0.24.2
+tensorflow_gpu
+tensorboard
