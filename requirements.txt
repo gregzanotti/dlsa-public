@@ -8,5 +8,12 @@ matplotlib==3.4.3
 twilio==6.63.1
 PyYAML==5.4.1
 scikit_learn==0.24.2
+# ML Frameworks
 tensorflow_gpu
+# viz during training
 tensorboard
+# linter
+black
+# EDA in one line of code
+pandas_profiling
+dtale
