@@ -12,8 +12,12 @@ scikit_learn==0.24.2
 tensorflow_gpu
 # viz during training
 tensorboard
-# linter
+# linting -- packaging
 black
+poetry 
 # EDA in one line of code
 pandas_profiling
 dtale
+#
+jupyterlab
+notebook
