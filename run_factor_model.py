@@ -53,10 +53,10 @@ def run_pca():
 
 
 def run_famafrench():
-    ff5 = pd.read_csv("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip", header=2, index_col=0)
-    mom = pd.read_csv("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_daily_CSV.zip", header=11, index_col=0)
-    strev = pd.read_csv("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_ST_Reversal_Factor_daily_CSV.zip", header=11, index_col=0)
-    ltrev = pd.read_csv("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_LT_Reversal_Factor_daily_CSV.zip", header=11, index_col=0)
+    ff5 = pd.read_csv("data/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip", header=2, index_col=0)
+    mom = pd.read_csv("data/F-F_Momentum_Factor_daily_CSV.zip", header=11, index_col=0)
+    strev = pd.read_csv("data/F-F_ST_Reversal_Factor_daily_CSV.zip", header=11, index_col=0)
+    ltrev = pd.read_csv("data/F-F_LT_Reversal_Factor_daily_CSV.zip", header=11, index_col=0)
     factors = [ff5,mom,strev,ltrev]
 
     for i in range(len(factors)):
