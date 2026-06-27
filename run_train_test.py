@@ -123,9 +123,29 @@ def run(config:dict,
         # load dates
         dates_filepath = 'data/F-F_Research_Data_5_Factors_2x3_daily.CSV'
         if not os.path.exists(dates_filepath):
-            ff5 = pd.read_csv("https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip", header=2, index_col=0)
+            import urllib.request, zipfile, io as pyio
+            url = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip"
+            response = urllib.request.urlopen(url)
+            with zipfile.ZipFile(pyio.BytesIO(response.read())) as z:
+                csv_filename = z.namelist()[0]
+                with z.open(csv_filename) as f:
+                    lines = [line.decode('utf-8') for line in f.readlines()]
+            header_idx = -1
+            for idx, line in enumerate(lines):
+                if "Mkt-RF" in line:
+                    header_idx = idx
+                    break
+            if header_idx == -1:
+                raise ValueError("Could not find Fama-French header in CSV file")
+            csv_data = "".join(lines[header_idx:])
+            ff5 = pd.read_csv(pyio.StringIO(csv_data), index_col=0)
+            os.makedirs(os.path.dirname(dates_filepath), exist_ok=True)
             ff5.to_csv(dates_filepath)
-        FamaFrenchDailyData = pd.read_csv(dates_filepath, index_col=0) / 100
+        FamaFrenchDailyData = pd.read_csv(dates_filepath, index_col=0)
+        idx_numeric = pd.to_numeric(FamaFrenchDailyData.index, errors='coerce')
+        FamaFrenchDailyData = FamaFrenchDailyData[~idx_numeric.isna()]
+        FamaFrenchDailyData.index = idx_numeric[~idx_numeric.isna()].astype(int)
+        FamaFrenchDailyData = FamaFrenchDailyData / 100
         daily_dates = pd.to_datetime(
             FamaFrenchDailyData.index[(FamaFrenchDailyData.index > 19980000) & (FamaFrenchDailyData.index < 20170000)],
             format ='%Y%m%d')
@@ -181,20 +201,32 @@ def run(config:dict,
                             # + f"__{int(time.time())}" \
             logging.info('STARTING: ' + model_tag)
             
-            if gpu_device_ids is None:
-                if   config['model']['lookback'] == 30 and config['length_training'] == 1000:
-                    num_gpus_needed = 3
-                elif config['model']['lookback'] == 30 and config['length_training'] >= 2000:
-                    num_gpus_needed = 3
-                elif config['model']['lookback'] == 60 and config['length_training'] == 1000:
-                    num_gpus_needed = 4
+            parallelize = True
+            if torch.cuda.is_available():
+                if gpu_device_ids is None:
+                    if   config['model']['lookback'] == 30 and config['length_training'] == 1000:
+                        num_gpus_needed = 3
+                    elif config['model']['lookback'] == 30 and config['length_training'] >= 2000:
+                        num_gpus_needed = 3
+                    elif config['model']['lookback'] == 60 and config['length_training'] == 1000:
+                        num_gpus_needed = 4
+                    else:
+                        logging.error("Unknown context for estimating number of GPUs needed for training")
+                        num_gpus_needed = int(input("Enter number of GPUs needed for model (integer):"))
+                        logging.info(f"User entered '{num_gpus_needed}' GPUs needed for this model's training")
+                    device_ids = get_free_gpu_ids(min_memory_mb=9000)[:num_gpus_needed]
                 else:
-                    logging.error("Unknown context for estimating number of GPUs needed for training")
-                    num_gpus_needed = int(input("Enter number of GPUs needed for model (integer):"))
-                    logging.info(f"User entered '{num_gpus_needed}' GPUs needed for this model's training")
-                device_ids = get_free_gpu_ids(min_memory_mb=9000)[:num_gpus_needed]
+                    device_ids = gpu_device_ids
+                device = f'cuda:{device_ids[0]}'
+            elif torch.backends.mps.is_available():
+                device = 'mps:0' # torch.accelerator.current_accelerator()
+                logging.info(f"MPS is available! You can use the Apple Silicon GPU {device}")
+                device_ids = [device]
             else:
-                device_ids = gpu_device_ids
+                logging.info("CUDA not available. Falling back to CPU.")
+                device_ids = []
+                device = 'cpu'
+                parallelize = False
 
             # prepare output folder            
             outdir = os.path.join(str(pathlib.Path().resolve()), 'results', config['model_name'])
@@ -217,10 +249,10 @@ def run(config:dict,
                                                                      residual_weights = residual_weights,
                                                                      save_params = True,
                                                                      force_retrain = config['force_retrain'],
-                                                                     parallelize = True, 
+                                                                     parallelize = parallelize, 
                                                                      log_dev_progress_freq = 10, 
                                                                      log_plot_freq = 149, 
-                                                                     device = f'cuda:{device_ids[0]}', 
+                                                                     device = device, 
                                                                      device_ids = device_ids,
                                                                      output_path = outdir, 
                                                                      num_epochs = config['num_epochs'], 
@@ -244,10 +276,10 @@ def run(config:dict,
                                                                          residual_weights = residual_weights,
                                                                          save_params = True,
                                                                          force_retrain = config['force_retrain'],
-                                                                         parallelize = True, 
+                                                                         parallelize = parallelize, 
                                                                          log_dev_progress_freq = 10, 
                                                                          log_plot_freq = 149, 
-                                                                         device = f'cuda:{device_ids[0]}', 
+                                                                         device = device, 
                                                                          device_ids = device_ids,
                                                                          output_path = outdir, 
                                                                          num_epochs = config['num_epochs'], 
