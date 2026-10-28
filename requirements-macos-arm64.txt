@@ -1,0 +1,20 @@
+# Dependencies for Python 3.13 on macOS ARM64 (Apple Silicon).
+# The original requirements.txt (Python <=3.9, CUDA) is kept unchanged.
+# Install: uv pip install -r requirements-macos-arm64.txt --python .venv/bin/python
+numpy>=2.1,<3
+pandas>=2.2.3,<3
+petname>=2.6
+psutil>=6.1
+torch>=2.5
+gpuinfo==1.0.0a7  # imported by utils.py; only works with nvidia-smi, harmless on macOS
+matplotlib>=3.9,<3.11  # train_test.test() uses plt.plot_date, removed in 3.11
+twilio>=9  # optional SMS notifications, imported by utils.py
+PyYAML>=6.0.2
+scikit-learn>=1.5.2
+
+# Tests
+pytest>=8
+
+# Notebook (notebooks/dlsa_walkthrough.ipynb)
+ipykernel>=6.29
+nbconvert>=7.16
